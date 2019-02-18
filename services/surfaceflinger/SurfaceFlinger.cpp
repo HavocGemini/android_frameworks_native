@@ -2302,8 +2302,8 @@ DisplayDevice::DisplayType SurfaceFlinger::determineDisplayType(hwc2_display_t d
         return  DisplayDevice::DISPLAY_EXTERNAL;
     } else if (connection == HWC2::Connection::Connected && !primaryDisplayId) {
         return DisplayDevice::DISPLAY_PRIMARY;
-    } else if (connection == HWC2::Connection::Connected && !externalDisplayId) {
-        return DisplayDevice::DISPLAY_EXTERNAL;
+    } else if ((display >= 0)&& (display < DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES)) {
+        return (DisplayDevice::DisplayType)display;
     }
 
     return DisplayDevice::DISPLAY_ID_INVALID;
@@ -3165,7 +3165,7 @@ status_t SurfaceFlinger::addClientLayer(const sp<Client>& client,
 
         if (gbc != nullptr) {
             mGraphicBufferProducerList.insert(IInterface::asBinder(gbc).get());
-            LOG_ALWAYS_FATAL_IF(mGraphicBufferProducerList.size() >
+            ALOGE_IF(mGraphicBufferProducerList.size() >
                                         mMaxGraphicBufferProducerListSize,
                                 "Suspected IGBP leak: %zu IGBPs (%zu max), %zu Layers",
                                 mGraphicBufferProducerList.size(),
