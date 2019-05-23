@@ -481,6 +481,7 @@ private:
                      const Vector<DisplayState>& /*displays*/) { }
     virtual void setDisplayAnimating(const sp<const DisplayDevice>& /*hw*/) { }
     virtual void handleMessageRefresh();
+    virtual void setLayerAsMask(const int32_t&, const uint64_t&) { };
 
     /* ------------------------------------------------------------------------
      * Message handling
@@ -671,7 +672,8 @@ private:
     void preComposition(nsecs_t refreshStartTime);
     void postComposition(nsecs_t refreshStartTime);
     void forceResyncModel();
-    size_t getVsyncSource();
+    int getVsyncSource();
+    void UpdateSyncModel(int current_source, int next_source);
     void updateCompositorTiming(
             nsecs_t vsyncPhase, nsecs_t vsyncInterval, nsecs_t compositeTime,
             std::shared_ptr<FenceTime>& presentFenceTime);
@@ -786,6 +788,7 @@ private:
 
     // access must be protected by mStateLock
     mutable Mutex mStateLock;
+    mutable Mutex mDolphinStateLock;
     State mCurrentState{LayerVector::StateSet::Current};
     volatile int32_t mTransactionFlags;
     Condition mTransactionCV;
@@ -853,6 +856,7 @@ private:
 
     // don't use a lock for these, we don't care
     std::bitset<DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES> mActiveDisplays;
+    std::bitset<DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES> mVsyncSources;
     std::bitset<DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES> mBuiltInBitmask;
     std::bitset<DisplayDevice::NUM_BUILTIN_DISPLAY_TYPES> mPluggableBitmask;
     std::mutex mVsyncPeriodMutex;
